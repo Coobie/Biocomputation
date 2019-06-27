@@ -66,5 +66,16 @@ public class Individual
         return r;
     }
     
+    public Individual(Individual i)
+    {
+        this.fitness = i.fitness;
+        this.geneNum = i.geneNum;
+        this.gene = new int[geneNum];
+        for (int j = 0; j < gene.length; j++)
+        {
+            this.gene[j] = i.gene[j];
+            
+        }
+    }
     
 }

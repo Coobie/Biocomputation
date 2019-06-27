@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -30,6 +31,7 @@ public class Population
     private int tSize;
     private FileRead file;
     private int ruleLength;
+    private Individual best;
 
     /**
      * Constructor for population
@@ -131,7 +133,7 @@ public class Population
     {
         for (Individual i : population)
         {
-            int n = 5; //Length of rule
+            int n = ruleLength; //Length of rule
             i.setFitness(0);
             ArrayList<Rule> rules = new ArrayList<>();
 
@@ -263,7 +265,7 @@ public class Population
 
             String line = g + "," + t + "," + avg + "," + best;
 
-            if (g == 1)
+            if (g == 0)
             {
                 writer.write("Generation, Total, Average, Best");
                 writer.newLine();
@@ -404,15 +406,15 @@ public class Population
         {
             Random rand = new Random();
             int chance = (int) (px * 100);
-            if (chance > rand.nextInt(100))
-            {
-                int[] parentIndex = new int[2];
+            int[] parentIndex = new int[2];
 
                 for (int j = 0; j < parentIndex.length; j++)
                 {
                     parentIndex[j] = rand.nextInt(selected.size());
                 }
-
+            if (chance > rand.nextInt(100))
+            {
+                
                 ArrayList<Individual> offSprings = this.crossover(selected, parentIndex);
 
                 for (Individual o : offSprings)
@@ -420,6 +422,11 @@ public class Population
                     allOffSprings.add(o);
                 }
 
+            }
+            else
+            {
+                allOffSprings.add(population.get(parentIndex[0]));
+                allOffSprings.add(population.get(parentIndex[1]));
             }
         }
         return allOffSprings;
@@ -430,8 +437,9 @@ public class Population
      *
      * @param px crossover chance
      */
-    public void performCrossoverAll(double px)
+    public ArrayList<Individual> performCrossoverAll(double px)
     {
+        ArrayList<Individual> allOffSprings = new ArrayList<>();
         for (int k = 0; k < tSize; k++)
         {
             Random rand = new Random();
@@ -446,39 +454,14 @@ public class Population
                     parentIndex[i] = rand.nextInt(population.size());
                 }
 
-                ArrayList<Individual> offSprings = this.crossover(population, parentIndex);
-
-                for (Individual o : offSprings)
+                 ArrayList<Individual> offSprings = this.crossover(population, parentIndex);
+                 for (Individual o : offSprings)
                 {
-                    population.add(o);
+                    allOffSprings.add(o);
                 }
-
-//        System.out.println("Parent 1");
-//        for (int i = 0; i < geneNum; i++)
-//        {
-//            System.out.print(population.get(parentIndex[0]).getGene(i));
-//        }
-//        System.out.println("");
-//        System.out.println("Parent 2");
-//        for (int i = 0; i < geneNum; i++)
-//        {
-//            System.out.print(population.get(parentIndex[1]).getGene(i));
-//        }
-//        System.out.println("");
-//        System.out.println("child 1");
-//        for (int i = 0; i < geneNum; i++)
-//        {
-//            System.out.print(child1[i]);
-//        }
-//        
-//        System.out.println("");
-//        System.out.println("child 2");
-//        for (int i = 0; i < geneNum; i++)
-//        {
-//            System.out.print(child2[i]);
-//        }
             }
         }
+        return allOffSprings;
     }
 
     /**
@@ -520,10 +503,18 @@ public class Population
 
         return offSprings;
     }
-
+    
     public void performTournament()
     {
         this.evaluate();
+        //this.randomReplace();
+        this.removeWorst();
+        //this.replaceWorst();
+        this.evaluate();
+    }
+
+    public void removeWorst()
+    {
 
         while (population.size() != popSize)
         {
@@ -540,6 +531,75 @@ public class Population
             }
             population.remove(worstIndex);
         }
+    }
+    
+    public void randomReplace()
+    {
+        while (population.size() != popSize)
+        {
+            Random rand = new Random();
+            int i = rand.nextInt(population.size());
+            
+//            if (population.get(i).getFitness() != this.bestEver)
+//            {
+//                population.remove(i);
+//            }
+           population.remove(i);
+        }
+    }
+    
+    public void replaceWorst()
+    {
+        List<Individual> previousPop = new ArrayList<>();
+        
+        for (Individual i : population.subList(0, popSize))
+        {
+            previousPop.add(new Individual(i));
+        }
+        
+        List<Individual> offSpringPop = new ArrayList<>();
+        for (Individual i : this.getPopulation().subList(popSize - 1, this.getPopulation().size()-1))
+        {
+            offSpringPop.add(new Individual(i));
+        }
+        
+        //Find best in previous
+        int fitnessPrevious = -1281028;
+        int indexPrevious = 0;
+        int j = 0;
+        for (Individual i : previousPop)
+        {
+            if (i.getFitness() > fitnessPrevious)
+            {
+                indexPrevious = j;
+                fitnessPrevious = i.getFitness();
+            }
+            j++;
+        }
+         
+        Individual previousBest = new Individual(previousPop.get(indexPrevious));       
+        
+        population.clear();
+        
+        for (Individual i : offSpringPop)
+        {
+            population.add(new Individual(i));
+        }
+        
+        int fitnessOff = 1000000;
+        int indexOff = 0;
+        j = 0;
+        for (Individual i : population)
+        {
+            if (i.getFitness() < fitnessOff)
+            {
+                indexOff = j;
+                fitnessOff = i.getFitness();
+            }
+            j++;
+        }
+        population.remove(indexOff);
+        population.add(new Individual(previousBest));
     }
 
     public Individual getBest()

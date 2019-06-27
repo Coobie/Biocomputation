@@ -16,20 +16,20 @@ import java.util.Random;
 public class GA
 {
 
-    private static final int popSize = 50; //Population size
-    private static final int geneNum = 60; //Number of genes each individual has
-    private static final int numGen = 500; //Number of generations to perform GA
+    private static final int popSize = 1000; //Population size
+    private static final int geneNum = 40; //Number of genes each individual has
+    private static final int numGen = 10000; //Number of generations to perform GA
     private static final int tournSize = Math.floorDiv(popSize, 2); //The size of the tournament 
-    private static final double mutationRate = 0.1; //Rate of mutation (0.01 = 1%)
-    private static final double crossRate = 0.65; //Chance of crossover (0.6 = 60%)
-    private static final int ruleLength = 5; //Length of rules and datast
+    private static final double mutationRate = 0.03; //Rate of mutation (0.01 = 1%)
+    private static final double crossRate = 0.85; //Chance of crossover (0.6 = 60%)
+    private static final int ruleLength = 7; //Length of rules and datast
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args)
     {
-
+        
         Population pop = new Population(popSize, tournSize, ruleLength);
 
         //Generate intial population       
@@ -86,7 +86,7 @@ public class GA
         System.out.println("----");
         System.out.println("Best:");
         System.out.println(pop.getBest() + "  " + pop.getBest().getFitness());
-
+        
     }
 
 }

@@ -26,7 +26,7 @@ public class FileRead
         this.input = new ArrayList<>();
         this.output = new ArrayList<>();
         File file
-                    = new File("C:\\Users\\Jacob\\OneDrive\\UWE-3\\BioComputation\\Bio\\src\\txt\\data1.txt");
+                    = new File("C:\\Users\\Jacob\\OneDrive\\UWE-3\\BioComputation\\Bio\\src\\txt\\data2.txt");
             Scanner sc = null;
             try
             {
