@@ -3,7 +3,7 @@
 
 Note 3 branches for each of the [datasets](src/txt).
 
-[Specification can be seen here](/Bio Spec.pdf)
+Specification can be seen in Bio Spec.pdf
 
 
 Copyright Coobie and UWE 2018
