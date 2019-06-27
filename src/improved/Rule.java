@@ -9,32 +9,32 @@ package improved;
  */
 public class Rule
 {
-    private int[] input;
+    private double[] input;
     
-    private int output;
+    private double output;
 
-    public Rule(int[] input, int output)
+    public Rule(double[] input, double output)
     {
         this.input = input;
         this.output = output;
     }
 
-    public int[] getInput()
+    public double[] getInput()
     {
         return input;
     }
 
-    public void setInput(int[] input)
+    public void setInput(double[] input)
     {
         this.input = input;
     }
 
-    public int getOutput()
+    public double getOutput()
     {
         return output;
     }
 
-    public void setOutput(int output)
+    public void setOutput(double output)
     {
         this.output = output;
     }

@@ -16,8 +16,8 @@ import java.util.logging.Logger;
  */
 public class FileRead
 {
-    private ArrayList<int[]> input;
-    private ArrayList<Integer> output;
+    private ArrayList<double[]> input;
+    private ArrayList<Double> output;
     private int rLength;
 
     public FileRead(int r)
@@ -26,7 +26,7 @@ public class FileRead
         this.input = new ArrayList<>();
         this.output = new ArrayList<>();
         File file
-                    = new File("C:\\Users\\Jacob\\OneDrive\\UWE-3\\BioComputation\\Bio\\src\\txt\\data2.txt");
+                    = new File("C:\\Users\\Jacob\\OneDrive\\UWE-3\\BioComputation\\Bio\\src\\txt\\data3.txt");
             Scanner sc = null;
             try
             {
@@ -42,25 +42,37 @@ public class FileRead
             {
                 line = sc.nextLine();
                 String[] a = line.split(" ");
-                int[] input = new int[rLength]; // Length of dataset
-                int output = 0;
-                for (int j = 0; j < a[0].length(); j++)
+                double[] input = new double[rLength]; // Length of dataset
+                double output = 0;
+                for (int j = 0; j < rLength; j++)
                 {
-                    input[j] = Character.getNumericValue(a[0].charAt(j)); 
+                    input[j] = Double.parseDouble(a[j]); 
                 }
-                output = Character.getNumericValue(a[1].charAt(0));
+                output = Character.getNumericValue(a[rLength].charAt(0));
  
                 this.input.add(input);
                 this.output.add(output);
             }
     }
+    
+    public FileRead()
+    {
+        
+    }
 
-    public int[] getInput(int i)
+    public FileRead(FileRead fr)
+    {
+        this.input = fr.input;
+        this.output = fr.output;
+        this.rLength = fr.rLength;
+    }
+    
+    public double[] getInput(int i)
     {
         return input.get(i);
     }
     
-    public int getOutput(int i)
+    public double getOutput(int i)
     {
         return output.get(i);
     }
@@ -69,8 +81,44 @@ public class FileRead
     {
         return  output.size();
     }
+
+    public ArrayList<double[]> getInput()
+    {
+        return input;
+    }
+
+    public void setInput(ArrayList<double[]> input)
+    {
+        this.input = input;
+    }
+
+    public ArrayList<Double> getOutput()
+    {
+        return output;
+    }
+
+    public void setOutput(ArrayList<Double> output)
+    {
+        this.output = output;
+    }
     
     
+    
+    public static void main(String[] args)
+    {
+        FileRead r = new FileRead(7);
+        
+        for (int i = 0; i < r.getCount(); i++)
+        {
+            System.out.print("Line:"+i+" ");
+            for (double d : r.getInput(i))
+            {
+                System.out.print(d +" ");
+            }
+            System.out.print(r.getOutput(i));
+            System.out.println("");
+        }
+    }
     
     
         

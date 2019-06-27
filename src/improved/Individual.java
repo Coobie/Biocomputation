@@ -12,7 +12,7 @@ package improved;
 public class Individual 
 {
     private int geneNum;
-    private int[] gene;
+    private double[] gene;
     private int fitness;
 
     /**
@@ -22,25 +22,25 @@ public class Individual
     public Individual(int n) 
     {
         this.geneNum = n;
-        this.gene  = new int[n];
+        this.gene  = new double[n];
     }
 
-    public int[] getGenes() 
+    public double[] getGenes() 
     {
         return gene;
     }
 
-    public void setGenes(int[] gene) 
+    public void setGenes(double[] gene) 
     {
         this.gene = gene;
     }
     
-    public void setGene(int n, int value)
+    public void setGene(int n, double value)
     {
         this.gene[n] = value;
     }
 
-    public int getGene(int i)
+    public double getGene(int i)
     {
         return this.gene[i];
     }
@@ -60,7 +60,7 @@ public class Individual
         String r = "";
         for (int i = 0; i < gene.length; i++)
         {
-            r += this.getGene(i);
+            r += this.getGene(i) + " ";
             
         }
         return r;
@@ -70,7 +70,7 @@ public class Individual
     {
         this.fitness = i.fitness;
         this.geneNum = i.geneNum;
-        this.gene = new int[geneNum];
+        this.gene = new double[geneNum];
         for (int j = 0; j < gene.length; j++)
         {
             this.gene[j] = i.gene[j];

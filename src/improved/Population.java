@@ -32,6 +32,10 @@ public class Population
     private FileRead file;
     private int ruleLength;
     private Individual best;
+    private int amountTestData = 600;
+
+    private ArrayList<Double> testOut = new ArrayList<>();
+    private ArrayList<double[]> testIn = new ArrayList<>();
 
     /**
      * Constructor for population
@@ -43,9 +47,30 @@ public class Population
     {
         this.popSize = popSize;
         this.tSize = tSize;
-        this.file = new FileRead(rLength);
         this.ruleLength = rLength;
 
+        this.file = new FileRead(rLength / 2);
+        int i = 0;
+        while (i != amountTestData)
+        {
+            Random r = new Random();
+            int a = r.nextInt(this.file.getCount());
+            this.testIn.add(this.file.getInput(a));
+            this.testOut.add(this.file.getOutput(a));
+            this.file.getOutput().remove(a);
+            this.file.getInput().remove(a);
+            i++;
+        }
+        //this.file = fr;
+//        System.out.println("size:"+ this.file.getCount());
+//        for (double[] ds : this.file.getInput())
+//        {
+//            for (double d : ds)
+//            {
+//                System.out.print(d);
+//            }
+//            System.out.println("");
+//        }
     }
 
     /**
@@ -78,57 +103,6 @@ public class Population
         this.evaulateRules();
     }
 
-    /**
-     * Calculates the fitness of the population for counting ones
-     */
-    private void evaluateCountOnes() // Counting ones
-    {
-        //Evaulation
-        for (Individual i : population)
-        {
-            i.setFitness(0);
-            int geneNum = i.getGenes().length;
-            for (int j = 0; j < geneNum; j++)
-            {
-                if (i.getGene(j) == 1)
-                {
-                    i.setFitness(i.getFitness() + 1);
-                }
-            }
-
-        }
-    }
-
-    private void evaluateXSq()
-    {
-        for (Individual i : population)
-        {
-            i.setFitness(this.binarytoInt(i.getGenes()));
-        }
-    }
-
-    private void evaulateComplex() // worksheet 2
-    {
-        for (Individual i : population)
-        {
-            double v = 0;
-
-            int n = i.getGenes().length;
-            int[] a = Arrays.copyOfRange(i.getGenes(), 0, (n + 1) / 2);
-            int[] b = Arrays.copyOfRange(i.getGenes(), (n + 1) / 2, n);
-
-            int x = this.getComplexVal(a);
-            int y = this.getComplexVal(b);
-
-            double fit = 0.26 * (Math.pow(x, 2) + Math.pow(y, 2)) - 0.48 * x * y;
-            if (x == -15 && y == -15)
-            {
-                System.out.println(fit);
-            }
-            i.setFitness((int) fit);
-        }
-    }
-
     private void evaulateRules() //Start cw
     {
         for (Individual i : population)
@@ -137,14 +111,14 @@ public class Population
             i.setFitness(0);
             ArrayList<Rule> rules = new ArrayList<>();
 
-            for (int j = 0; j < i.getGenes().length; j += n + 1) //TODO: change value
+            for (int j = 0; j < i.getGenes().length; j += n + 1)
             {
-                int[] input = new int[n];
+                double[] input = new double[n];
                 for (int k = j; k < j + n; k++)
                 {
                     input[k - j] = i.getGene(k);
                 }
-                int output = i.getGene(j + n);
+                double output = i.getGene(j + n);
                 rules.add(new Rule(input, output));
             }
 
@@ -153,36 +127,20 @@ public class Population
             {
                 for (Rule r : rules)
                 {
-                    if (Arrays.equals(r.getInput(), file.getInput(j))) //Arrays are the exact same
+                    if ((file.getInput(j)[0] > r.getInput()[0]) && (file.getInput(j)[0] < r.getInput()[1])
+                            && (file.getInput(j)[1] > r.getInput()[2]) && (file.getInput(j)[1] < r.getInput()[3])
+                            && (file.getInput(j)[2] > r.getInput()[4]) && (file.getInput(j)[2] < r.getInput()[5])
+                            && (file.getInput(j)[3] > r.getInput()[6]) && (file.getInput(j)[3] < r.getInput()[7])
+                            && (file.getInput(j)[4] > r.getInput()[8]) && (file.getInput(j)[4] < r.getInput()[9])
+                            && (file.getInput(j)[5] > r.getInput()[10]) && (file.getInput(j)[5] < r.getInput()[11])
+                            && (file.getInput(j)[6] > r.getInput()[12]) && (file.getInput(j)[6] < r.getInput()[13]))
+
                     {
                         if (r.getOutput() == file.getOutput(j))
                         {
                             i.setFitness(i.getFitness() + 1);
                         }
                         break;
-                    } else
-                    {
-                        boolean correct = false;
-                        for (int k = 0; k < r.getInput().length; k++)
-                        {
-                            if (r.getInput()[k] == file.getInput(j)[k] || r.getInput()[k] == 2)
-                            {
-                                correct = true;
-                            } else
-                            {
-                                correct = false;
-                                break;
-                            }
-                        }
-
-                        if (correct == true)
-                        {
-                            if (r.getOutput() == file.getOutput(j))
-                            {
-                                i.setFitness(i.getFitness() + 1);
-                            }
-                            break;
-                        }
                     }
                 }
 
@@ -293,10 +251,7 @@ public class Population
         this.evaluate();
         for (Individual i : population)
         {
-            for (int j = 0; j < i.getGenes().length; j++)
-            {
-                System.out.print(i.getGene(j));
-            }
+            System.out.print(i);
             System.out.print("  " + i.getFitness());
             System.out.println("");
         }
@@ -319,7 +274,7 @@ public class Population
                 int chance = (int) (pm * 100);
                 if (chance > rand.nextInt(100))
                 {
-                    if ((j % ruleLength == 0) || (j == i.getGenes().length - 1))
+                    if (((j % ruleLength == 0) || (j == i.getGenes().length - 1)) && j != 0)
                     { //Output
                         if (i.getGene(j) == 1)
                         {
@@ -331,38 +286,34 @@ public class Population
                     } else
                     { //Input
                         Random rand2 = new Random();
+                        double amt = rand2.nextInt(100000);
+                        //double amt = rand2.nextInt(1000);
+                        amt = amt / 1000000;
+                        //amt = amt / 10000;
+                        double value = 0;
+                        //Plus or minus
                         int c = rand2.nextInt(2);
-
-                        switch (i.getGene(j))
+                        if (c == 0)
                         {
-                            case 0:
-                                if (c == 0)
-                                {
-                                    i.setGene(j, 1);
-                                } else
-                                {
-                                    i.setGene(j, 2);
-                                }
-                                break;
-                            case 1:
-                                if (c == 0)
-                                {
-                                    i.setGene(j, 0);
-                                } else
-                                {
-                                    i.setGene(j, 2);
-                                }
-                                break;
-                            case 2:
-                                if (c == 0)
-                                {
-                                    i.setGene(j, 1);
-                                } else
-                                {
-                                    i.setGene(j, 0);
-                                }
-                                break;
+                            if (i.getGene(j) + amt > 1)
+                            {
+                                value = i.getGene(j) - amt;
+                            } else
+                            {
+                                value = i.getGene(j) + amt;
+                            }
+                        } else
+                        {
+                            if (i.getGene(j) - amt < 0)
+                            {
+                                value = i.getGene(j) + amt;
+                            } else
+                            {
+                                value = i.getGene(j) - amt;
+                            }
                         }
+                        i.setGene(j, value);
+
                     }
 
                 }
@@ -408,13 +359,13 @@ public class Population
             int chance = (int) (px * 100);
             int[] parentIndex = new int[2];
 
-                for (int j = 0; j < parentIndex.length; j++)
-                {
-                    parentIndex[j] = rand.nextInt(selected.size());
-                }
+            for (int j = 0; j < parentIndex.length; j++)
+            {
+                parentIndex[j] = rand.nextInt(selected.size());
+            }
             if (chance > rand.nextInt(100))
             {
-                
+
                 ArrayList<Individual> offSprings = this.crossover(selected, parentIndex);
 
                 for (Individual o : offSprings)
@@ -422,8 +373,7 @@ public class Population
                     allOffSprings.add(o);
                 }
 
-            }
-            else
+            } else
             {
                 allOffSprings.add(population.get(parentIndex[0]));
                 allOffSprings.add(population.get(parentIndex[1]));
@@ -454,8 +404,8 @@ public class Population
                     parentIndex[i] = rand.nextInt(population.size());
                 }
 
-                 ArrayList<Individual> offSprings = this.crossover(population, parentIndex);
-                 for (Individual o : offSprings)
+                ArrayList<Individual> offSprings = this.crossover(population, parentIndex);
+                for (Individual o : offSprings)
                 {
                     allOffSprings.add(o);
                 }
@@ -478,8 +428,8 @@ public class Population
         int geneNum = list.get(0).getGenes().length;
         int point = rand.nextInt(geneNum);
 
-        int[] child1 = new int[geneNum];
-        int[] child2 = new int[geneNum];
+        double[] child1 = new double[geneNum];
+        double[] child2 = new double[geneNum];
         for (int i = 0; i < point; i++)
         {
             child1[i] = list.get(parentIndex[0]).getGene(i);
@@ -503,7 +453,7 @@ public class Population
 
         return offSprings;
     }
-    
+
     public void performTournament()
     {
         this.evaluate();
@@ -532,37 +482,37 @@ public class Population
             population.remove(worstIndex);
         }
     }
-    
+
     public void randomReplace()
     {
         while (population.size() != popSize)
         {
             Random rand = new Random();
             int i = rand.nextInt(population.size());
-            
+
 //            if (population.get(i).getFitness() != this.bestEver)
 //            {
 //                population.remove(i);
 //            }
-           population.remove(i);
+            population.remove(i);
         }
     }
-    
+
     public void replaceWorst()
     {
         List<Individual> previousPop = new ArrayList<>();
-        
+
         for (Individual i : population.subList(0, popSize))
         {
             previousPop.add(new Individual(i));
         }
-        
+
         List<Individual> offSpringPop = new ArrayList<>();
-        for (Individual i : this.getPopulation().subList(popSize - 1, this.getPopulation().size()-1))
+        for (Individual i : this.getPopulation().subList(popSize - 1, this.getPopulation().size() - 1))
         {
             offSpringPop.add(new Individual(i));
         }
-        
+
         //Find best in previous
         int fitnessPrevious = -1281028;
         int indexPrevious = 0;
@@ -576,16 +526,16 @@ public class Population
             }
             j++;
         }
-         
-        Individual previousBest = new Individual(previousPop.get(indexPrevious));       
-        
+
+        Individual previousBest = new Individual(previousPop.get(indexPrevious));
+
         population.clear();
-        
+
         for (Individual i : offSpringPop)
         {
             population.add(new Individual(i));
         }
-        
+
         int fitnessOff = 1000000;
         int indexOff = 0;
         j = 0;
@@ -615,4 +565,48 @@ public class Population
         return null;
     }
 
+    public double testBest()
+    {
+        double acc = 0;
+        Individual best = this.getBest();
+        ArrayList<Rule> rules = new ArrayList<>();
+        int n = ruleLength; //Length of rule
+        for (int j = 0; j < best.getGenes().length; j += n + 1)
+        {
+            double[] input = new double[n];
+            for (int k = j; k < j + n; k++)
+            {
+                input[k - j] = best.getGene(k);
+            }
+            double output = best.getGene(j + n);
+            rules.add(new Rule(input, output));
+        }
+        int q = 0;
+        
+        for (int i = 0; i < this.testOut.size(); i++)
+        {
+            for (Rule r : rules)
+                {
+                    if ((this.testIn.get(i)[0] > r.getInput()[0]) && (this.testIn.get(i)[0] < r.getInput()[1])
+                            && (this.testIn.get(i)[1] > r.getInput()[2]) && (this.testIn.get(i)[1] < r.getInput()[3])
+                            && (this.testIn.get(i)[2] > r.getInput()[4]) && (this.testIn.get(i)[2] < r.getInput()[5])
+                            && (this.testIn.get(i)[3] > r.getInput()[6]) && (this.testIn.get(i)[3] < r.getInput()[7])
+                            && (this.testIn.get(i)[4] > r.getInput()[8]) && (this.testIn.get(i)[4] < r.getInput()[9])
+                            && (this.testIn.get(i)[5] > r.getInput()[10]) && (this.testIn.get(i)[5] < r.getInput()[11])
+                            && (this.testIn.get(i)[6] > r.getInput()[12]) && (this.testIn.get(i)[6] < r.getInput()[13]))
+
+                    {
+                        if (r.getOutput() == this.testOut.get(i))
+                        {
+                            q++;
+                        }
+                        break;
+                    }
+                }
+        }
+        
+        acc = q/amountTestData;
+        
+        return q;
+    }
 }
